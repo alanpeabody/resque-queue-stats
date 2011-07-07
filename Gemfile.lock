@@ -44,5 +44,5 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.0.0)
   jeweler (~> 1.6.4)
-  resque
+  resque (~> 1.17.0)
   ruby-debug19
