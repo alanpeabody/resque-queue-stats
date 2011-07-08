@@ -9,9 +9,18 @@ class Job
   end
 end
 
+class FailedJob
+  extend Resque::Plugins::QueueStats
+  @queue = :failing_test
+
+  def self.perform(*payload)
+    raise 'Fail'
+  end
+end
+
 class TestResqueQueueStats < Test::Unit::TestCase
   def setup
-    @worker = Resque::Worker.new(:test)
+    @worker = Resque::Worker.new(:test, :failing_test)
   end
 
   def test_lint
@@ -30,6 +39,20 @@ class TestResqueQueueStats < Test::Unit::TestCase
     3.times { @worker.work(0) }
 
     assert_equal 3, Job.performed_count
+
+  end
+
+  def test_failed_job_count
+
+    FailedJob.reset_failed_count
+
+    assert_equal 0, FailedJob.failed_count
+
+    2.times { Resque.enqueue(Job) }
+    3.times { Resque.enqueue(FailedJob) }
+    5.times { @worker.work(0) }
+
+    assert_equal 3, FailedJob.failed_count
 
   end
 
