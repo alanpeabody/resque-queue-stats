@@ -1,5 +1,4 @@
 require 'resque'
-require 'ruby-debug'
 
 module Resque
   module Plugins
